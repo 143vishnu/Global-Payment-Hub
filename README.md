@@ -81,8 +81,6 @@ npm start
 ### Access the Application
 
 - **Frontend:** http://localhost:3000
-- **Backend API:** http://localhost:8080
-- **API Documentation:** http://localhost:8080/swagger-ui.html
 
 ### Default Login Credentials
 
