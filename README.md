@@ -89,8 +89,8 @@ npm start
 | Username  | Password | Role          | Access                                      |
 |-----------|----------|---------------|---------------------------------------------|
 | admin     | admin    | ADMIN         | Full access (all pages including Admin)     |
-| opsuser   | password | OPS_USER      | Operations access (no Admin page)           |
-| business  | password | BUSINESS_USER | View-only (Dashboard and Reports only)      |
+| opsuser   | ops123   | OPS_USER      | Operations access (no Admin page)           |
+| business  | business123 | BUSINESS_USER | View-only (Dashboard and Reports only)   |
 
 ## 👥 User Roles
 
