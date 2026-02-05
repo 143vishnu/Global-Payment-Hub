@@ -1,4 +1,4 @@
-# Global Payment Strategy (GPS/P3)
+# Global Payment Hub (GPH/P3)
 
 Enterprise-grade payment processing platform with Spring Boot backend and React frontend.
 
