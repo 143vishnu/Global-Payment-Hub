@@ -1,0 +1,131 @@
+# ============================================================================
+# Development Environment Profile Configuration
+# ============================================================================
+# Used for shared development environment
+# Features: H2/Test DB, moderate logging, basic monitoring
+# ============================================================================
+
+spring:
+  # H2 Database Configuration (Dev)
+  datasource:
+    url: jdbc:h2:file:./data/gps_dev_db;MODE=Oracle;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: dev_password
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 3
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: GPS-Dev-HikariPool
+      connection-test-query: SELECT 1 FROM DUAL
+  
+  # H2 Console (Restricted)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+  
+  # JPA Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
+  
+  # Kafka Configuration (Dev Environment)
+  kafka:
+    bootstrap-servers: dev-kafka-01.jpmc.com:9092,dev-kafka-02.jpmc.com:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+        compression.type: snappy
+        linger.ms: 10
+        batch.size: 16384
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      max-poll-records: 100
+      properties:
+        isolation.level: read_committed
+        session.timeout.ms: 30000
+  
+  # JMS Configuration (IBM MQ - Dev)
+  jms:
+    pub-sub-domain: false
+    listener:
+      acknowledge-mode: auto
+      auto-startup: true
+      concurrency: 3
+      max-concurrency: 10
+
+# IBM MQ Configuration (Dev Environment)
+ibm:
+  mq:
+    queue-manager: DEV_QM1
+    channel: DEV.APP.SVRCONN
+    host: dev-ibmmq-01.jpmc.com
+    port: 1414
+    user: dev_mq_user
+    password: ${IBM_MQ_PASSWORD:dev_mq_pass}
+    queue:
+      payment-request: DEV.QUEUE.PAYMENT.REQUEST
+      payment-response: DEV.QUEUE.PAYMENT.RESPONSE
+      payment-dlq: DEV.QUEUE.PAYMENT.DLQ
+
+# Server Configuration
+server:
+  port: 8080
+  shutdown: graceful
+
+# Logging Configuration (Moderate verbosity)
+logging:
+  level:
+    root: INFO
+    com.GPS.Global.Payment.Strategy: DEBUG
+    org.springframework.web: INFO
+    org.springframework.kafka: INFO
+    org.springframework.jms: INFO
+    org.hibernate.SQL: DEBUG
+    org.springframework.integration: INFO
+  file:
+    name: logs/gps-dev.log
+    max-size: 50MB
+    max-history: 7
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Management & Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Application Config
+application:
+  environment: dev
+  debug-mode: false

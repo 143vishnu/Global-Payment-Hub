@@ -1,0 +1,15 @@
+package com.GPS.Global.Payment.Strategy.exception;
+
+/**
+ * Exception thrown when payment is not found
+ */
+public class PaymentNotFoundException extends RuntimeException {
+
+    public PaymentNotFoundException(String message) {
+        super(message);
+    }
+
+    public PaymentNotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

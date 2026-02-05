@@ -1,0 +1,118 @@
+# ============================================================================
+# Local Development Profile Configuration
+# ============================================================================
+# Used for local development on developer workstations
+# Features: H2 console, debug logging, relaxed security
+# ============================================================================
+
+# Disable Kafka and IBM MQ for local development
+kafka:
+  enabled: false
+
+ibm:
+  mq:
+    enabled: false
+
+spring:
+  # Disable ActiveMQ auto-configuration for local development
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration
+  
+  # H2 Database Configuration
+  datasource:
+    url: jdbc:h2:file:./data/gps_db;MODE=Oracle;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 600000
+  
+  # H2 Console
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+        trace: false
+  
+  # JPA Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 10
+  
+  # Kafka Configuration (Local - Embedded or Docker)
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: 1
+      retries: 2
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        isolation.level: read_committed
+  
+  # JMS Configuration (IBM MQ - Local)
+  jms:
+    pub-sub-domain: false
+    listener:
+      acknowledge-mode: auto
+      auto-startup: false
+      concurrency: 1
+      max-concurrency: 3
+
+# Server Configuration
+server:
+  port: 8080
+
+# Logging Configuration (Verbose for local dev)
+logging:
+  level:
+    root: INFO
+    com.GPS.Global.Payment.Strategy: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.kafka: INFO
+    org.springframework.jms: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.integration: DEBUG
+  file:
+    name: logs/gps-local.log
+    max-size: 10MB
+    max-history: 3
+
+# Management & Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+
+# Application Config
+application:
+  environment: local
+  debug-mode: true
